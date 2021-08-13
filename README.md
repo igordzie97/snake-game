@@ -1,4 +1,4 @@
-# Snake Game - Projekt zaliczeniowy dla przedmiotu Wprowadzenie do informatyki
+# Snake Game
 Prosta gra, która wykorzystuje bibliotekę PyGamge.
 
 ### Features:
