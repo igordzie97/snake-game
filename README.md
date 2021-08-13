@@ -1,4 +1,4 @@
-# Sname Game - Python Project for Introduction to Computer Science
+# Snake Game - Python Project for Introduction to Computer Science
 A simple game created in Python using PyGame library.
 
 ### Features:
