@@ -5,30 +5,30 @@ import random
 pygame.init()
 pygame.mixer.music.load("features/snake.wav")
 
-BIALY = (255,255,255)
-CZARNY = (0,0,0)
-CZERWONY = (250,0,0)
-ZIELONY = (0,155,0)
-NIEBIESKI = (0,0,255)
+WHITE = (255,255,255)
+BLACK = (0,0,0)
+RED = (250,0,0)
+GREEN = (0,155,0)
+BLUE = (0,0,255)
 
-SZEROKOSC_DISPLAY = 1100
-WYSOKOSC_DISPLAY = 800
+WIDTH_DISPLAY = 1100
+HEIGHT_DISPLAY = 800
 
-gameDisplay = pygame.display.set_mode((SZEROKOSC_DISPLAY,WYSOKOSC_DISPLAY))
+game_display = pygame.display.set_mode((WIDTH_DISPLAY,HEIGHT_DISPLAY))
 pygame.display.set_caption('SNAKE')
-IKONA = pygame.image.load('features/ikona.png')
+ICON = pygame.image.load('features/ikona.png')
 
-pygame.display.set_icon(IKONA)
+pygame.display.set_icon(ICON)
 pygame.display.update()
 
-TLO_START = pygame.image.load('features/tlo.jpg')
-TLO_START = pygame.transform.scale(TLO_START,(SZEROKOSC_DISPLAY,WYSOKOSC_DISPLAY))
-GLOWA_SNAKE = pygame.image.load('features/head_s.png')
+BACKGROUND_START = pygame.image.load('features/tlo.jpg')
+BACKGROUND_START = pygame.transform.scale(BACKGROUND_START,(WIDTH_DISPLAY,HEIGHT_DISPLAY))
+HEAD_SNAKE = pygame.image.load('features/head_s.png')
 APPLE_IMG = pygame.image.load('features/apple.png')
 
-APPLE_GRUBOSC = 30
-WYMIAR_SNAKE = 20
-KIERUNEK = "PRAWY"
+APPLE_WIDTH = 30
+SIZE_SNAKE = 20
+DIRECTION = "RIGHT"
 
 SMALL_FONT = pygame.font.SysFont("comicsansms",25)
 MED_FONT = pygame.font.SysFont("comicsansms", 45)
@@ -36,66 +36,55 @@ LARGE_FONT = pygame.font.SysFont("comicsansms",70)
 
 CLOCK = pygame.time.Clock()
 
-
-
-
-def czcionki_obiekty(tekst,kolor,rozmiar):
-	if rozmiar == "SMALL":
-		textCZCIONKA = SMALL_FONT.render(tekst,True,kolor)
-	elif rozmiar == "MEDIUM":
-		textCZCIONKA = MED_FONT.render(tekst,True,kolor)
-	elif rozmiar == "LARGE":
-		textCZCIONKA = LARGE_FONT.render(tekst,True,kolor)
+def fonts_objects(text,colour,size):
+	if size == "SMALL":
+		text_font = SMALL_FONT.render(text,True,colour)
+	elif size == "MEDIUM":
+		text_font = MED_FONT.render(text,True,colour)
+	elif size == "LARGE":
+		text_font = LARGE_FONT.render(text,True,colour)
 	
-	return textCZCIONKA, textCZCIONKA.get_rect()
+	return text_font, text_font.get_rect()
 
-
-def wiadomosc_na_ekran(tekst,kolor,H=0,rozmiar="SMALL"):
-	textCZCIONKA,textPROSTOKAT = czcionki_obiekty(tekst,kolor,rozmiar)
+def display_message(text,colour,H=0,size="SMALL"):
+	text_font,text_rectangle = fonts_objects(text,colour,size)
 	
-	textPROSTOKAT.center = (SZEROKOSC_DISPLAY/2),(WYSOKOSC_DISPLAY/2) + H
-	gameDisplay.blit(textCZCIONKA,textPROSTOKAT)
+	text_rectangle.center = (WIDTH_DISPLAY/2),(HEIGHT_DISPLAY/2) + H
+	game_display.blit(text_font,text_rectangle)
 
+def results(result):
+	result = SMALL_FONT.render("RESULT: " + str(result),True,BLACK)
+	game_display.blit(result,[0,0])
 
-def wynik(wynik):
-	wynik = SMALL_FONT.render("WYNIK: " + str(wynik),True,CZARNY)
-	gameDisplay.blit(wynik,[0,0])
-
-
-def muzyka_gameOver():
+def music_game_over():
 	over = pygame.mixer.Sound("features/die.ogg")
 	over.play()
 
-
-def muzyka_jedzenia():
+def music_food():
 	eat_sound = pygame.mixer.Sound("features/eat.ogg")
 	eat_sound.play()
 
+def random_apple():
+	rand_appple_x = round(random.randrange(0,WIDTH_DISPLAY - APPLE_WIDTH))
+	rand_appple_y = round(random.randrange(0,HEIGHT_DISPLAY - APPLE_WIDTH))
+	return rand_appple_x,rand_appple_y
 
-def losowanie_Apple():
-	randAppleX = round(random.randrange(0,SZEROKOSC_DISPLAY - APPLE_GRUBOSC))
-	randAppleY = round(random.randrange(0,WYSOKOSC_DISPLAY - APPLE_GRUBOSC))
-	return randAppleX,randAppleY
-
-
-def snake(WYMIAR_SNAKE,snakeTable):
-	if KIERUNEK == "PRAWY":
-		glowa = pygame.transform.rotate(GLOWA_SNAKE,270)
-	elif KIERUNEK == "LEWY":
-		glowa = pygame.transform.rotate(GLOWA_SNAKE,90)
-	elif KIERUNEK == "GORA":
-		glowa = GLOWA_SNAKE
-	elif KIERUNEK == "DOL":
-		glowa = pygame.transform.rotate(GLOWA_SNAKE,180)
+def snake(snake_size,snake_table):
+	if DIRECTION == "RIGHT":
+		head = pygame.transform.rotate(HEAD_SNAKE,270)
+	elif DIRECTION == "LEFT":
+		head = pygame.transform.rotate(HEAD_SNAKE,90)
+	elif DIRECTION == "UP":
+		head = HEAD_SNAKE
+	elif DIRECTION == "DOWN":
+		head = pygame.transform.rotate(HEAD_SNAKE,180)
 	
-	gameDisplay.blit(glowa,(snakeTable[-1][0], snakeTable[-1][1])) # tutaj ogarnac jeszcze raz o co chodzi
+	game_display.blit(head,(snake_table[-1][0], snake_table[-1][1]))
 	
-	for XiY in snakeTable[:-1]:
-		pygame.draw.rect(gameDisplay,ZIELONY,[XiY[0],XiY[1],WYMIAR_SNAKE,WYMIAR_SNAKE])	#tablica w tablicy 
-	
+	for xy in snake_table[:-1]:
+		pygame.draw.rect(game_display,GREEN,[xy[0],xy[1],snake_size,snake_size])
 
-
-def intro_gry():
+def game_intro():
 	intro = True
 	
 	while intro:
@@ -110,24 +99,22 @@ def intro_gry():
 					pygame.quit()
 					quit()
 
-		gameDisplay.blit(TLO_START,[0,0])
-		wiadomosc_na_ekran("Witaj w grze SNAKE!",BIALY,-300,"LARGE")
-		wiadomosc_na_ekran("Cel-Zadbaj,zeby Snake nie byl glodny",CZERWONY,-175,"MEDIUM")
-		wiadomosc_na_ekran("Im wiecej jablek zjesz - tym Snake bedzie wiekszy!",BIALY,-70,"MEDIUM")
-		wiadomosc_na_ekran("Wpadniesz w swoj ogon,albo sciane - Umierasz",CZERWONY,50,"MEDIUM")
-		wiadomosc_na_ekran("Wcisnij SPACJA by zaczac,ESC-zeby wyjsc,P-pauza",BIALY,180,"MEDIUM")
+		game_display.blit(BACKGROUND_START,[0,0])
+		display_message("WLECOME TO SNAKE GAME!",WHITE,-300,"LARGE")
+		display_message("YOUR GOAL - Don't let snake to be hungry",RED,-175,"MEDIUM")
+		display_message("The more apple you eat, the bigger you will be!",WHITE,-70,"MEDIUM")
+		display_message("Don't die - avoid your tail",RED,50,"MEDIUM")
+		display_message("SPACE - begin, ESC - exit, P - pause",WHITE,180,"MEDIUM")
 		pygame.display.update()
 		
 		CLOCK.tick(5)
 
-	
-
-def pauza ():
+def pause ():
 	pygame.mixer.music.pause()
 	paused = True
 	
-	wiadomosc_na_ekran("PAUZA",CZARNY,-100,"LARGE")
-	wiadomosc_na_ekran("Wcisnij SPACJA-kontynuuj, ESC-wyjdz",CZARNY,30,"MEDIUM")
+	display_message("PAUSE",BLACK,-100,"LARGE")
+	display_message("SPACE - continue, ESC - exit",BLACK,30,"MEDIUM")
 	pygame.display.update()
 	
 	while paused:
@@ -142,127 +129,114 @@ def pauza ():
 				elif event.key == pygame.K_ESCAPE:
 					pygame.quit()
 					quit()
-		
+
 		CLOCK.tick(5)
 
-
-def gameLoop():
-	
+def game_loop():
 	pygame.mixer.music.play(-1)
-	global KIERUNEK #to jest chyba zbedne
-	FPS=10
-	WYNIK = 0
-	KIERUNEK = "PRAWY"
-	gameExit = False
-	gameOver = False
+	global DIRECTION 
+	FPS = 10
+	RESULT = 0
+	DIRECTION = "RIGHT"
+	game_exit = False
+	game_over = False
 	
-	POCZATKOWY_X = SZEROKOSC_DISPLAY/2
-	POCZATKOWY_Y = WYSOKOSC_DISPLAY/2
-	POCZATKOWY_X_ZMIANA = 10
-	POCZATKOWY_Y_ZMIANA = 0
+	BEGIN_X = WIDTH_DISPLAY/2
+	BEGIN_Y = HEIGHT_DISPLAY/2
+	BEGIN_X_CHANGE = 10
+	BEGIN_Y_CHANGE = 0
 	
-	snakeTABLE = []
-	snakeDLUGOSC = 1
+	snake_table = []
+	snake_size = 1
 	
-	randAppleX,randAppleY = losowanie_Apple()
+	rand_apple_x,rand_apple_y = random_apple()
 	
-	while not gameExit:
-		if gameOver == True:
+	while not game_exit:
+		if game_over == True:
 			pygame.mixer.music.pause()
 
-			wiadomosc_na_ekran("GAME OVER!",CZERWONY,-180,"LARGE")
-			wiadomosc_na_ekran("Twoj wynik wyniosl: " + str(WYNIK),CZARNY,-60,"MEDIUM")
-			wiadomosc_na_ekran("SPACJA - jeszcze raz, ESC - wyjdz z gry",CZARNY,50,"MEDIUM")
+			display_message("GAME OVER!",RED,-180,"LARGE")
+			display_message("Your result: " + str(RESULT),BLACK,-60,"MEDIUM")
+			display_message("SPACE - play again, ESC - exit the game",RED,50,"MEDIUM")
 			pygame.display.update()
 	
-		while gameOver == True:
+		while game_over == True:
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
-					gameExit = True
-					gameOver = False
+					game_exit = True
+					game_over = False
 				elif event.type == pygame.KEYDOWN:
 					if event.key == pygame.K_ESCAPE:
-						gameExit = True
-						gameOver = False
+						game_exit = True
+						game_over = False
 					if event.key == pygame.K_SPACE:
-						gameLoop()
+						game_loop()
 		
 
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
-				gameExit = True
+				game_exit = True
 			elif event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_LEFT:
-					KIERUNEK = "LEWY"
-					POCZATKOWY_X_ZMIANA -= WYMIAR_SNAKE
-					POCZATKOWY_Y_ZMIANA = 0
+					DIRECTION = "LEFT"
+					BEGIN_X_CHANGE -= SIZE_SNAKE
+					BEGIN_Y_CHANGE = 0
 				elif event.key == pygame.K_RIGHT:
-					KIERUNEK = "PRAWY"
-					POCZATKOWY_X_ZMIANA += WYMIAR_SNAKE
-					POCZATKOWY_Y_ZMIANA = 0
+					DIRECTION = "RIGHT"
+					BEGIN_X_CHANGE += SIZE_SNAKE
+					BEGIN_Y_CHANGE = 0
 				elif event.key == pygame.K_UP:
-					KIERUNEK = "GORA"
-					POCZATKOWY_X_ZMIANA = 0
-					POCZATKOWY_Y_ZMIANA -= WYMIAR_SNAKE
+					DIRECTION = "UP"
+					BEGIN_X_CHANGE = 0
+					BEGIN_Y_CHANGE -= SIZE_SNAKE
 				elif event.key == pygame.K_DOWN:
-					KIERUNEK = "DOL"
-					POCZATKOWY_X_ZMIANA = 0
-					POCZATKOWY_Y_ZMIANA += WYMIAR_SNAKE
+					DIRECTION = "DOWN"
+					BEGIN_X_CHANGE = 0
+					BEGIN_Y_CHANGE += SIZE_SNAKE
 				elif event.key == pygame.K_p:
-					pauza()
+					pause()
 
-		if POCZATKOWY_X >= SZEROKOSC_DISPLAY or POCZATKOWY_X <= 0 or POCZATKOWY_Y >= WYSOKOSC_DISPLAY or POCZATKOWY_Y <= 0:
-			muzyka_gameOver()
-			gameOver = True
+		if BEGIN_X >= WIDTH_DISPLAY or BEGIN_X <= 0 or BEGIN_Y >= HEIGHT_DISPLAY or BEGIN_Y <= 0:
+			music_game_over()
+			game_over = True
 
-
-
-		POCZATKOWY_X += POCZATKOWY_X_ZMIANA
-		POCZATKOWY_Y += POCZATKOWY_Y_ZMIANA
+		BEGIN_X += BEGIN_X_CHANGE
+		BEGIN_Y += BEGIN_Y_CHANGE
 		
-		gameDisplay.fill(BIALY)
-		gameDisplay.blit(APPLE_IMG,(randAppleX,randAppleY))
+		game_display.fill(WHITE)
+		game_display.blit(APPLE_IMG,(rand_apple_x,rand_apple_y))
 		
-		snakeHEAD = []
-		snakeHEAD.append(POCZATKOWY_X)
-		snakeHEAD.append(POCZATKOWY_Y)
-		snakeTABLE.append(snakeHEAD)
+		snake_head = []
+		snake_head.append(BEGIN_X)
+		snake_head.append(BEGIN_Y)
+		snake_table.append(snake_head)
 
-		if len(snakeTABLE) > snakeDLUGOSC:
-			del snakeTABLE[0]
+		if len(snake_table) > snake_size:
+			del snake_table[0]
 
-		for kazdySegment in snakeTABLE[:-1]:
-			if kazdySegment == snakeHEAD:
-				gameOver = True
-				muzyka_gameOver()
+		for element in snake_table[:-1]:
+			if element == snake_head:
+				game_over = True
+				music_game_over()
 		
-		snake(WYMIAR_SNAKE,snakeTABLE)
-		wynik(WYNIK)
+		snake(SIZE_SNAKE,snake_table)
+		results(RESULT)
 		pygame.display.update()
 		
 		CLOCK.tick(FPS)
 
-		if POCZATKOWY_X > randAppleX and POCZATKOWY_X < randAppleX + APPLE_GRUBOSC or POCZATKOWY_X + WYMIAR_SNAKE > randAppleX and POCZATKOWY_X + WYMIAR_SNAKE <randAppleX + APPLE_GRUBOSC:
-			if POCZATKOWY_Y > randAppleY and POCZATKOWY_Y < randAppleY + APPLE_GRUBOSC or POCZATKOWY_Y + WYMIAR_SNAKE > randAppleY and POCZATKOWY_Y + WYMIAR_SNAKE <randAppleY + APPLE_GRUBOSC:
+		if BEGIN_X > rand_apple_x and BEGIN_X < rand_apple_x + APPLE_WIDTH or BEGIN_X + SIZE_SNAKE > rand_apple_x and BEGIN_X + SIZE_SNAKE < rand_apple_x + APPLE_WIDTH:
+			if BEGIN_X > rand_apple_y and BEGIN_Y < rand_apple_y + APPLE_WIDTH or BEGIN_Y + SIZE_SNAKE > rand_apple_y and BEGIN_Y + SIZE_SNAKE < rand_apple_y + APPLE_WIDTH:
 				
-				randAppleX,randAppleY = losowanie_Apple()
-				muzyka_jedzenia()
+				rand_apple_x, rand_apple_y = random_apple()
+				music_food()
 				if FPS < 28:
 					FPS += 1
-				snakeDLUGOSC += 1
-				WYNIK += 1
+				snake_size += 1
+				RESULT += 1
 
-
-		
 	pygame.quit()
 	quit()
 
-
-
-intro_gry()
-gameLoop()
-			
-
-
-	
-
+game_intro()
+game_loop()
